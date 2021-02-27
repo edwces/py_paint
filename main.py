@@ -19,6 +19,7 @@ class Application():
         """ Stworz wszystkie obiekty """
         self.grid = Grid(self.EKRAN, (0, 0), ROWS, COLUMNS, PAINTABLE_SIZE) # stworz miejsce na rysowanie
         self.mouse = Cursor() # obiekt ktory pozwala na malowanie
+        self.grid.draw()
 
     def update(self):
         """ Funkcja, ktora odswierza ekran """ # zmienic klatki na sekunde dla tej funkcji, sprawdzanie nie zawsze potrzebne
@@ -33,8 +34,9 @@ class Application():
     def draw_frames(self):
         """ Funkcja, która rysuje na ekranie """
 
-        self.grid.draw()
+
         # licznik fps
+        pg.draw.rect(self.EKRAN, BIALY, (0,0, 50, 20))
         czcionka = pg.font.SysFont('Arial', 12) # stworzenie czcionki
         tekst_fps = czcionka.render(f"{self.clock.get_fps():.2f}", True, (255,0,0)) # --> Surface   |  render tekstu
         self.EKRAN.blit(tekst_fps, (5,5)) # narysowanie tekstu na ekranie, osadzenie obiektu Surface na Ekranie(też surface)

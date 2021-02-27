@@ -14,21 +14,25 @@ def pos_to_grid(x,y,size):
     return row, column
 
 
-class Paintable():
+class Paintable(): # TODO
     """ czesc ekranu na ktorej mozna malowac """
 
-    def __init__(self, size, color):
+    def __init__(self, size, color, pos, ekran):
         self.color = color
         self.size = size
+        self.pos = pos
+        self.EKRAN = ekran
         self.surface = pg.Surface((size, size))
         self.surface.fill(color)
 
-    def draw(self, EKRAN, x, y):
-        EKRAN.blit(self.surface, (x, y))
+    def draw(self):
+        self.EKRAN.blit(self.surface, self.pos)
 
     def update(self, color):
         self.color = color
         self.surface.fill(self.color)
+        self.draw()
+
 
 class Grid():
     """ Klasa ktora tworzy miejsce do malowania """
@@ -45,22 +49,27 @@ class Grid():
         for row in range(self.rows):
             self.grid.append([])
             for column in range(self.columns):
-               self.grid[row].append(Paintable(self.size, color))
+               self.grid[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), self.EKRAN))
 
     def draw(self):
         for row in range(self.rows):
             for obj in range(self.columns):
-                self.grid[row][obj].draw(self.EKRAN, self.posx + (self.size * obj), self.posy + (self.size * row))
+                self.grid[row][obj].draw()
 
     def getGrid(self):
         return self.grid
 
     def update_color(self, x, y, color):
         row, column = pos_to_grid(x, y, self.size)
+
         try:
-            self.grid[row][column].update(color)
+            if self.grid[row][column].color == color:
+                pass
+            else:
+                self.grid[row][column].update(color)
         except IndexError:
             pass
+        
 
 class Cursor():
     """ Kursor sluzacy do malowania """
@@ -71,5 +80,6 @@ class Cursor():
 
     def update_pos(self):
         self.posx, self.posy = pg.mouse.get_pos() # TODO: zrobic tak aby pygame zwracal uwage na kazda zmiane pozycji
+
     def is_clicked(self):
         return pg.mouse.get_pressed()[0]
