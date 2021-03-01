@@ -7,6 +7,8 @@
 import pygame as pg
 from pygame.locals import *
 from py_paint_settings import *
+import math
+
 
 def pos_to_grid(x,y,size):
     row = int(y / size)
@@ -15,18 +17,18 @@ def pos_to_grid(x,y,size):
 
 
 class Paintable(): # TODO
-    """ czesc ekranu na ktorej mozna malowac """
+    """ czesc WINDOWu na ktorej mozna malowac """
 
-    def __init__(self, size, color, pos, ekran):
+    def __init__(self, size, color, pos, WINDOW):
         self.color = color
         self.size = size
         self.pos = pos
-        self.EKRAN = ekran
+        self.WINDOW = WINDOW
         self.surface = pg.Surface((size, size))
         self.surface.fill(color)
 
     def draw(self):
-        self.EKRAN.blit(self.surface, self.pos)
+        self.WINDOW.blit(self.surface, self.pos)
 
     def update(self, color):
         self.color = color
@@ -37,8 +39,8 @@ class Paintable(): # TODO
 class Grid():
     """ Klasa ktora tworzy miejsce do malowania """
 
-    def __init__(self, EKRAN, pos, rows, columns, size, color=DEFAULT_COLOR):
-        self.EKRAN = EKRAN
+    def __init__(self, WINDOW, pos, rows, columns, size, color=DEFAULT_COLOR):
+        self.WINDOW = WINDOW
         self.pos = pos
         self.posx, self.posy = self.pos
         self.rows = int(rows)
@@ -49,7 +51,7 @@ class Grid():
         for row in range(self.rows):
             self.grid.append([])
             for column in range(self.columns):
-               self.grid[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), self.EKRAN))
+               self.grid[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), self.WINDOW))
 
     def draw(self):
         for row in range(self.rows):
@@ -69,17 +71,22 @@ class Grid():
                 self.grid[row][column].update(color)
         except IndexError:
             pass
-        
+
 
 class Cursor():
     """ Kursor sluzacy do malowania """
 
     def __init__(self):
-        self.posx, self.posy = pg.mouse.get_pos()
-        self.click_status = pg.mouse.get_pressed()[0]
+        self.x, self.y = (0,0)
+        self.prevx, self.prevy = (0,0)
+        self.click_status = bool
+        self.prev_click_status = bool
 
     def update_pos(self):
-        self.posx, self.posy = pg.mouse.get_pos() # TODO: zrobic tak aby pygame zwracal uwage na kazda zmiane pozycji
+        self.prevx, self.prevy = self.x, self.y
+        self.x, self.y = pg.mouse.get_pos() # TODO: zrobic tak aby pygame zwracal uwage na kazda zmiane pozycji
 
     def is_clicked(self):
-        return pg.mouse.get_pressed()[0]
+        self.prev_click_status = self.click_status
+        self.click_status = pg.mouse.get_pressed()[0]
+        return self.click_status
