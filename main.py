@@ -4,10 +4,14 @@ from py_paint_settings import *
 from class_module import *
 import sys
 
-def draw_color_pallete(colors=6):
-    buttons
-    for color in range(colors):
-        color_button = Color_Button
+def draw_color_pallete(WINDOW):
+    buttons_list = []
+    for color in range(len(COLORS)):
+        button = Color_Button(WINDOW, WIDTH - 30, 20 * (color + 1), 15, 15, COLORS[color])
+        button.draw()
+        buttons_list.append(button)
+    return buttons_list
+
 
 
 def GUI():
@@ -19,7 +23,7 @@ def GUI():
     return surface
 
 
-def add_missing_points(mouse, prevx, prevy, x, y, size, grid):
+def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
     if mouse.prev_click_status == True:
         missingx = x - prevx
         missingy = y - prevy
@@ -30,7 +34,7 @@ def add_missing_points(mouse, prevx, prevy, x, y, size, grid):
             for i in range(int(steps)):
                 prevx += dx
                 prevy += dy
-                grid.update_color(prevx, prevy, (0,255,255))
+                grid.update_color(prevx, prevy, color)
         except ZeroDivisionError:
             pass
 
@@ -43,7 +47,7 @@ class Application():
         self.WINDOW = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         pg.display.set_caption(TITLE)
-        self.options = {"color":(0,0,0)
+        self.options = {"color":(0,0,0),
                         "brushsize":1}
 
     def setup(self):
@@ -54,7 +58,7 @@ class Application():
 
         self.grid.draw()
         self.WINDOW.blit(self.GUI, (WIDTH-50, 0))
-        
+        self.color_pallete = draw_color_pallete(self.WINDOW)
 
     def update(self):
         """ Funkcja, ktora odswierza WINDOW """ # zmienic klatki na sekunde dla tej funkcji, sprawdzanie nie zawsze potrzebne
@@ -62,8 +66,13 @@ class Application():
 
         if self.mouse.is_clicked():
             self.mouse.update_pos() # jezeli myszka je
-            self.grid.update_color(self.mouse.x, self.mouse.y, (0, 255, 255))
-            add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x, self.mouse.y, PAINTABLE_SIZE, self.grid)
+            color_input = self.mouse.rect.collidelist(self.color_pallete)
+            if not color_input == -1:
+                self.options["color"] = self.color_pallete[color_input].color
+            else:
+                self.grid.update_color(self.mouse.x, self.mouse.y, (self.options["color"]))
+                add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x, self.mouse.y, PAINTABLE_SIZE, self.grid, self.options["color"])
+
         pg.display.flip()
 
 
@@ -94,6 +103,6 @@ def main():
         app.update()
         app.draw_frames()
         dt = app.clock.tick(FPS) / 1000 # limit FPS
-        print(dt)
+        #print(dt)
 
 main()

@@ -81,10 +81,12 @@ class Cursor():
         self.prevx, self.prevy = (0,0)
         self.click_status = bool
         self.prev_click_status = bool
+        self.rect = pg.Rect(self.x, self.y, 1, 1)
 
     def update_pos(self):
         self.prevx, self.prevy = self.x, self.y
         self.x, self.y = pg.mouse.get_pos() # TODO: zrobic tak aby pygame zwracal uwage na kazda zmiane pozycji
+        self.rect.topleft = (self.x, self.y)
 
     def is_clicked(self):
         self.prev_click_status = self.click_status
@@ -113,7 +115,5 @@ class Color_Button(Button):
         self.surface.fill(color)
 
     def draw(self):
+        pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6))
         self.WINDOW.blit(self.surface, self.pos)
-
-    def if_clicked(self):
-        pass
