@@ -90,3 +90,30 @@ class Cursor():
         self.prev_click_status = self.click_status
         self.click_status = pg.mouse.get_pressed()[0]
         return self.click_status
+
+
+class Button():
+    """ Buttons which are placen on the GUI surface """
+
+    def __init__(self, WINDOW, x, y, w, h):
+        self.pos = (x, y)
+        self.WINDOW = WINDOW
+        self.width = w
+        self.height = h
+        self.surface = pg.Surface((w, h))
+        self.rect = self.surface.get_rect()
+        self.rect.topleft = self.pos
+
+class Color_Button(Button):
+    """ Color pallete buttons """
+
+    def __init__(self, WINDOW, x, y, w, h, color):
+        super().__init__(WINDOW, x, y, w, h)
+        self.color = color
+        self.surface.fill(color)
+
+    def draw(self):
+        self.WINDOW.blit(self.surface, self.pos)
+
+    def if_clicked(self):
+        pass
