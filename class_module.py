@@ -1,13 +1,12 @@
 #################################
 # py_paint by edwces
 # 2021
-# Pixel painter program
+# Drawing Program made in Python
 #################################
 
 import pygame as pg
 from pygame.locals import *
 from py_paint_settings import *
-import math
 
 
 def pos_to_grid(x,y,size):
@@ -16,8 +15,8 @@ def pos_to_grid(x,y,size):
     return row, column
 
 
-class Paintable(): # TODO
-    """ czesc WINDOWu na ktorej mozna malowac """
+class Paintable():
+    """ Cell with changeble color """
 
     def __init__(self, size, color, pos, WINDOW):
         self.color = color
@@ -37,7 +36,7 @@ class Paintable(): # TODO
 
 
 class Grid():
-    """ Klasa ktora tworzy miejsce do malowania """
+    """ Space, where you paint"""
 
     def __init__(self, WINDOW, pos, rows, columns, size, color=DEFAULT_COLOR):
         self.WINDOW = WINDOW
@@ -48,7 +47,7 @@ class Grid():
         self.size = size
         self.grid = []
 
-        for row in range(self.rows):
+        for row in range(self.rows): # Create grid of Paintable objects
             self.grid.append([])
             for column in range(self.columns):
                self.grid[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), self.WINDOW))
@@ -65,16 +64,16 @@ class Grid():
         row, column = pos_to_grid(x, y, self.size)
 
         try:
-            if self.grid[row][column].color == color:
+            if self.grid[row][column].color == color: # if Paintable already has that color value pass
                 pass
             else:
-                self.grid[row][column].update(color)
-        except IndexError:
+                self.grid[row][column].update(color) # change color of given Paintable
+        except IndexError: # if you are beyond the grid space
             pass
 
 
 class Cursor():
-    """ Kursor sluzacy do malowania """
+    """ Cursor variables """
 
     def __init__(self):
         self.x, self.y = (0,0)
@@ -85,7 +84,7 @@ class Cursor():
 
     def update_pos(self):
         self.prevx, self.prevy = self.x, self.y
-        self.x, self.y = pg.mouse.get_pos() # TODO: zrobic tak aby pygame zwracal uwage na kazda zmiane pozycji
+        self.x, self.y = pg.mouse.get_pos()
         self.rect.topleft = (self.x, self.y)
 
     def is_clicked(self):
@@ -110,10 +109,10 @@ class Color_Button(Button):
     """ Color pallete buttons """
 
     def __init__(self, WINDOW, x, y, w, h, color):
-        super().__init__(WINDOW, x, y, w, h)
+        super().__init__(WINDOW, x, y, w, h) # Initialize the Button class
         self.color = color
         self.surface.fill(color)
 
     def draw(self):
-        pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6))
+        pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6)) # Button border
         self.WINDOW.blit(self.surface, self.pos)
