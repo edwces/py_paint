@@ -1,2 +1,2 @@
 # py_paint 
-A drawing program that is still in work
+py_paint is a drawing program made in Python
