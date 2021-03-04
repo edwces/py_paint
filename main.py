@@ -9,19 +9,20 @@ from pygame.locals import *
 from py_paint_settings import *
 from class_module import *
 import sys
+from os import path, listdir
 
 
 def draw_color_pallete(WINDOW):
     """ Creates color_Buttons and draws them on the window """
     buttons_list = []
     for color in range(len(COLORS)): # for each color that we have in settings.py
-        button = Color_Button(WINDOW, WIDTH - 30, 20 * (color + 1), 15, 15, COLORS[color])
+        button = Color_Button(WINDOW, WIDTH - 30, 20 * (color + 1), BUTTON_WIDTH, BUTTON_HEIGHT, COLORS[color])
         button.draw()
         buttons_list.append(button)
     return buttons_list # return all of the buttons in the list
 
 
-def GUI():
+def draw_GUI():
     surface = pg.Surface((GUI_WIDTH, GUI_HEIGHT))
     background = surface.get_rect()
     pg.draw.rect(surface, GUI_BORDER, background) # draw a border
@@ -57,12 +58,25 @@ class Application():
         pg.display.set_caption(TITLE)
         self.options = {"color":(0,0,0)} # App options
         self.debug = debug # debug option
+        self.load_assets()
+
+    def load_assets(self): # IMPORTANT: this method doesnt do anything right now
+        """ Load assets into the app """
+        directory = path.dirname(__file__)              #
+        img_folder = path.join(directory, "img")        # Get all the directories
+        tools_folder = path.join(img_folder, "tools")   #
+
+        self.tools_imgs = [] # All tools surface objects
+        for img in listdir(tools_folder):
+            surface = pg.image.load(path.join(tools_folder, img))
+            self.tools_imgs.append(surface)
+
 
     def setup(self):
         """ Create all the objects and draw neccesary stuff"""
         self.grid = Grid(self.WINDOW, (0, 0), ROWS, COLUMNS, PAINTABLE_SIZE) # Create a grid to draw
         self.mouse = Cursor()
-        self.GUI = GUI()
+        self.GUI = draw_GUI()
 
         self.grid.draw()
         self.WINDOW.blit(self.GUI, (WIDTH-50, 0))
@@ -70,7 +84,6 @@ class Application():
 
     def update(self):
         """ Function, that updates app variables"""
-
 
         if self.mouse.is_clicked():
             self.mouse.update_pos()
@@ -87,8 +100,6 @@ class Application():
 
     def draw_frames(self):
         """ Function that draws on window """
-
-
         # FPS counter
         if self.debug:
             pg.draw.rect(self.WINDOW, WHITE, (0,0, 50, 20)) # make new text visible
