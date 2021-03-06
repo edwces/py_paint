@@ -11,24 +11,22 @@ from class_module import *
 import sys
 from os import path, listdir
 
+def draw_tools(WINDOW, img_tools):
+    tools_button_list = []
+    for tool in range(len(TOOLS)): # for each tool that we have in settings.py
+        button = Button(WINDOW, WIDTH - 33, 27 * ((tool + 11) + 1), BUTTON_WIDTH+5, BUTTON_HEIGHT+5, "tool", img_tools[tool], TOOLS[tool])
+        button.draw()
+        tools_button_list.append(button)
+    return tools_button_list
 
 def draw_color_pallete(WINDOW):
     """ Creates color_Buttons and draws them on the window """
-    buttons_list = []
+    color_buttons_list = []
     for color in range(len(COLORS)): # for each color that we have in settings.py
         button = Button(WINDOW, WIDTH - 30, 20 * (color + 1), BUTTON_WIDTH, BUTTON_HEIGHT, "color", COLORS[color])
         button.draw()
-        buttons_list.append(button)
-    return buttons_list # return all of the buttons in the list
-
-
-def draw_GUI():
-    surface = pg.Surface((GUI_WIDTH, GUI_HEIGHT))
-    background = surface.get_rect()
-    pg.draw.rect(surface, GUI_BORDER, background) # draw a border
-    pg.draw.rect(surface, GUI_BACKGROUND, (background[0] + 5, background[1] + 5, background[2], background[3] - 10))
-
-    return surface
+        color_buttons_list.append(button)
+    return color_buttons_list # return all of the buttons in the list
 
 
 def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
@@ -56,7 +54,7 @@ class Application():
         self.WINDOW = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         pg.display.set_caption(TITLE)
-        self.options = {"color":(0,0,0)} # App options
+        self.options = {"color":(0,0,0), "tool":"brush"} # App options
         self.debug = debug # debug option
         self.load_assets()
 
@@ -81,23 +79,31 @@ class Application():
         self.grid.draw()
         self.WINDOW.blit(self.GUI, (WIDTH-50, 0))
         self.color_pallete = draw_color_pallete(self.WINDOW)
-        self.brush_tool = Button(self.WINDOW, WIDTH - 30, 300, BUTTON_WIDTH + 5, BUTTON_HEIGHT + 5, "tool", self.tools_imgs[0])
-        self.brush_tool.draw()
-        self.eraser_tool = Button(self.WINDOW, WIDTH - 30, 325, BUTTON_WIDTH + 5, BUTTON_HEIGHT + 5, "tool", self.tools_imgs[1])
-        self.eraser_tool.draw()
+        self.tools_buttons = draw_tools(self.WINDOW, self.tools_imgs)
+        self.buttons = self.color_pallete + self.tools_buttons
 
     def update(self):
         """ Function, that updates app variables"""
 
         if self.mouse.is_clicked():
             self.mouse.update_pos()
-            color_input = self.mouse.rect.collidelist(self.color_pallete) # return index of a color_pallete list if you click on color button
-            if (not color_input == -1) and (not self.mouse.prev_click_status):
-                self.options["color"] = self.color_pallete[color_input].color # change the color you are drawing
+            button_input = self.mouse.rect.collidelist(self.buttons) # return index of a color_pallete list if you click on color button
+
+            if (not button_input == -1) and (not self.mouse.prev_click_status):
+                if self.buttons[button_input].b_type == "color":
+                    self.options["color"] = self.buttons[button_input].color # change the color you are drawing
+                elif self.buttons[button_input].b_type == "tool":
+                    self.options["tool"] = self.buttons[button_input].function # change your tool
+
             else:
-                self.grid.update_color(self.mouse.x, self.mouse.y, (self.options["color"])) # update color of a clicked Paintable
-                add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
-                                   self.mouse.y, PAINTABLE_SIZE, self.grid, self.options["color"])
+                if self.options["tool"] == "brush":
+                    self.grid.update_color(self.mouse.x, self.mouse.y, (self.options["color"])) # update color of a clicked Paintable
+                    add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
+                                       self.mouse.y, PAINTABLE_SIZE, self.grid, self.options["color"])
+                elif self.options["tool"] == "eraser":
+                    self.grid.update_color(self.mouse.x, self.mouse.y, WHITE) # update color of a clicked Paintable
+                    add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
+                                       self.mouse.y, PAINTABLE_SIZE, self.grid, WHITE)
 
         pg.display.flip() # Update the screen
 

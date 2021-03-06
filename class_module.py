@@ -14,6 +14,14 @@ def pos_to_grid(x,y,size):
     column = int(x / size)
     return row, column
 
+def draw_GUI():
+    surface = pg.Surface((GUI_WIDTH, GUI_HEIGHT))
+    background = surface.get_rect()
+    pg.draw.rect(surface, GUI_BORDER, background) # draw a border
+    pg.draw.rect(surface, GUI_BACKGROUND, (background[0] + 5, background[1] + 5, background[2], background[3] - 10))
+
+    return surface
+
 
 class Paintable():
     """ Cell with changeble color """
@@ -96,7 +104,7 @@ class Cursor():
 class Button():
     """ Buttons which are placen on the GUI surface """
 
-    def __init__(self, WINDOW, x, y, w, h, b_type, var):
+    def __init__(self, WINDOW, x, y, w, h, b_type, var, function=None):
         self.pos = (x, y)
         self.WINDOW = WINDOW
         self.width = w
@@ -107,9 +115,9 @@ class Button():
             self.surface = pg.Surface((w, h))
             self.surface.fill(self.color)
         elif b_type == "tool":
+            self.function = function
             self.surface = pg.transform.smoothscale(var, (w, h)).convert_alpha()
-        self.rect = self.surface.get_rect()
-        self.rect.topleft = self.pos
+        self.rect = pg.Rect(self.pos, (w,h))
 
     def draw(self):
         pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6)) # Button border
@@ -122,4 +130,3 @@ class Color_Button(Button):
         super().__init__(WINDOW, x, y, w, h) # Initialize the Button class
         self.color = color
         self.surface.fill(color)
-
