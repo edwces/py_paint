@@ -13,8 +13,8 @@ from os import path, listdir
 
 def draw_tools(WINDOW, img_tools):
     tools_button_list = []
-    for tool in range(len(TOOLS)): # for each tool that we have in settings.py
-        button = Button(WINDOW, WIDTH - 33, 27 * ((tool + 11) + 1), BUTTON_WIDTH+5, BUTTON_HEIGHT+5, "tool", img_tools[tool], TOOLS[tool])
+    for i, tool in enumerate(TOOLS): # for each tool that we have in settings.py
+        button = Button(WINDOW, WIDTH - 33, 27 * ((i + 11) + 1), BUTTON_WIDTH+5, BUTTON_HEIGHT+5, "tool", img_tools[tool], tool)
         button.draw()
         tools_button_list.append(button)
     return tools_button_list
@@ -22,8 +22,8 @@ def draw_tools(WINDOW, img_tools):
 def draw_color_pallete(WINDOW):
     """ Creates color_Buttons and draws them on the window """
     color_buttons_list = []
-    for color in range(len(COLORS)): # for each color that we have in settings.py
-        button = Button(WINDOW, WIDTH - 30, 20 * (color + 1), BUTTON_WIDTH, BUTTON_HEIGHT, "color", COLORS[color])
+    for i, color in enumerate(COLORS): # for each color that we have in settings.py
+        button = Button(WINDOW, WIDTH - 30, 20 * (i + 1), BUTTON_WIDTH, BUTTON_HEIGHT, "color", color)
         button.draw()
         color_buttons_list.append(button)
     return color_buttons_list # return all of the buttons in the list
@@ -64,10 +64,12 @@ class Application():
         img_folder = path.join(directory, "img")        # Get all the directories
         tools_folder = path.join(img_folder, "tools")   #
 
-        self.tools_imgs = [] # All tools surface objects
+        self.tools_imgs = {} # All tools surface objects
         for img in listdir(tools_folder):
+            name = path.splitext(img)[0]
             surface = pg.image.load(path.join(tools_folder, img))
-            self.tools_imgs.append(surface)
+            print(name)
+            self.tools_imgs[name] = surface
 
 
     def setup(self):
@@ -104,12 +106,17 @@ class Application():
                     self.grid.update_color(self.mouse.x, self.mouse.y, WHITE) # update color of a clicked Paintable
                     add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
                                        self.mouse.y, PAINTABLE_SIZE, self.grid, WHITE)
+                elif self.options["tool"] == "color_picker":
+                    selected_color = self.grid.get_color(self.mouse.x, self.mouse.y)
+                    if selected_color:
+                        self.options["color"] = selected_color # change the color you are drawing
 
         pg.display.flip() # Update the screen
 
 
     def draw_frames(self):
         """ Function that draws on window """
+
         # FPS counter
         if self.debug:
             pg.draw.rect(self.WINDOW, WHITE, (0,0, 50, 20)) # make new text visible

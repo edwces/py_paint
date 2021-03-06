@@ -65,8 +65,16 @@ class Grid():
             for obj in range(self.columns):
                 self.grid[row][obj].draw()
 
-    def getGrid(self):
-        return self.grid
+
+    def get_color(self, x, y):
+        row, column = pos_to_grid(x, y, self.size)
+        try:
+            selected_color = self.grid[row][column].color
+            return selected_color
+        except IndexError: # if you are beyond the grid space
+            return False
+
+
 
     def update_color(self, x, y, color):
         row, column = pos_to_grid(x, y, self.size)
@@ -100,7 +108,6 @@ class Cursor():
         self.click_status = pg.mouse.get_pressed()[0]
         return self.click_status
 
-
 class Button():
     """ Buttons which are placen on the GUI surface """
 
@@ -122,11 +129,3 @@ class Button():
     def draw(self):
         pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6)) # Button border
         self.WINDOW.blit(self.surface, self.pos)
-
-class Color_Button(Button):
-    """ Color pallete buttons """
-
-    def __init__(self, WINDOW, x, y, w, h, color):
-        super().__init__(WINDOW, x, y, w, h) # Initialize the Button class
-        self.color = color
-        self.surface.fill(color)
