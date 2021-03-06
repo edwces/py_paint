@@ -96,14 +96,24 @@ class Cursor():
 class Button():
     """ Buttons which are placen on the GUI surface """
 
-    def __init__(self, WINDOW, x, y, w, h):
+    def __init__(self, WINDOW, x, y, w, h, b_type, var):
         self.pos = (x, y)
         self.WINDOW = WINDOW
         self.width = w
         self.height = h
-        self.surface = pg.Surface((w, h))
+        self.b_type = b_type
+        if b_type == "color":
+            self.color = var
+            self.surface = pg.Surface((w, h))
+            self.surface.fill(self.color)
+        elif b_type == "tool":
+            self.surface = pg.transform.smoothscale(var, (w, h)).convert_alpha()
         self.rect = self.surface.get_rect()
         self.rect.topleft = self.pos
+
+    def draw(self):
+        pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6)) # Button border
+        self.WINDOW.blit(self.surface, self.pos)
 
 class Color_Button(Button):
     """ Color pallete buttons """
@@ -113,6 +123,3 @@ class Color_Button(Button):
         self.color = color
         self.surface.fill(color)
 
-    def draw(self):
-        pg.draw.rect(self.WINDOW, BUTTON_BACKGROUND, (self.rect[0] - 3, self.rect[1] - 3, self.rect[2] + 6, self.rect[3] + 6)) # Button border
-        self.WINDOW.blit(self.surface, self.pos)

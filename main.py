@@ -16,7 +16,7 @@ def draw_color_pallete(WINDOW):
     """ Creates color_Buttons and draws them on the window """
     buttons_list = []
     for color in range(len(COLORS)): # for each color that we have in settings.py
-        button = Color_Button(WINDOW, WIDTH - 30, 20 * (color + 1), BUTTON_WIDTH, BUTTON_HEIGHT, COLORS[color])
+        button = Button(WINDOW, WIDTH - 30, 20 * (color + 1), BUTTON_WIDTH, BUTTON_HEIGHT, "color", COLORS[color])
         button.draw()
         buttons_list.append(button)
     return buttons_list # return all of the buttons in the list
@@ -36,7 +36,7 @@ def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
     if mouse.prev_click_status == True: # if last frame mouse was clicked
         missingx = x - prevx
         missingy = y - prevy
-        steps = max(abs(missingx), abs(missingy)) # how many times we have to add inputs
+        steps = max(abs(missingx), abs(missingy)) + max(abs(missingx), abs(missingy)) # how many times we have to add inputs
         try:
             dx = missingx / steps # average of how much dx we have to add each step
             dy = missingy / steps
@@ -51,7 +51,7 @@ pg.init() # Initaliaze pygame
 
 class Application():
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=True):
         """ Create window and create important variables"""
         self.WINDOW = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
@@ -81,6 +81,10 @@ class Application():
         self.grid.draw()
         self.WINDOW.blit(self.GUI, (WIDTH-50, 0))
         self.color_pallete = draw_color_pallete(self.WINDOW)
+        self.brush_tool = Button(self.WINDOW, WIDTH - 30, 300, BUTTON_WIDTH + 5, BUTTON_HEIGHT + 5, "tool", self.tools_imgs[0])
+        self.brush_tool.draw()
+        self.eraser_tool = Button(self.WINDOW, WIDTH - 30, 325, BUTTON_WIDTH + 5, BUTTON_HEIGHT + 5, "tool", self.tools_imgs[1])
+        self.eraser_tool.draw()
 
     def update(self):
         """ Function, that updates app variables"""
