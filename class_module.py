@@ -40,7 +40,7 @@ class Paintable():
     def update(self, color):
         self.color = color
         self.surface.fill(self.color)
-        self.draw()
+        
 
 
 class Grid():
@@ -54,6 +54,7 @@ class Grid():
         self.columns = int(columns)
         self.size = size
         self.grid = []
+        self.updated_cells = []
 
         for row in range(self.rows): # Create grid of Paintable objects
             self.grid.append([])
@@ -65,25 +66,50 @@ class Grid():
             for obj in range(self.columns):
                 self.grid[row][obj].draw()
 
+    def get_neigbours(self, selected_row, selected_column):
+        neighbours = []
+        for i in range(-1, 2, 2):
+            if self.is_in_grid((selected_row + (-1 * i), selected_column)):
+                new = self.grid[selected_row + (-1 * i)][selected_column]
+                neighbours.append(new)
+        for i in range(-1, 2, 2):
+            if self.is_in_grid((selected_row, selected_column  + (-1 *i))):
+                new = self.grid[selected_row][selected_column + (-1 *i)]
+                neighbours.append(new)
+        return neighbours
+
+
+    def draw_updated_cells(self):
+        for paintable in self.updated_cells:
+            paintable.draw()
+        self.updated_cells = []
+
+    def is_in_grid(self, grid_pos):
+        occurrence = True
+        try:
+            self.grid[grid_pos[0]][grid_pos[1]]
+        except IndexError:
+            occurrence = False
+        return occurrence
 
     def get_color(self, selected_row, selected_column):
-        try:
+        if self.is_in_grid((selected_row, selected_column)):
             selected_color = self.grid[selected_row][selected_column].color
             return selected_color
-        except IndexError: # if you are beyond the grid space
-            return False
 
 
+    def get_grid(self):
+        return self.grid
 
-    def update_color(self, selected_row, selected_column, color):
+    
 
-        try:
-            if self.grid[selected_row][selected_column].color == color: # if Paintable already has that color value pass
-                pass
-            else:
-                self.grid[selected_row][selected_column].update(color) # change color of given Paintable
-        except IndexError: # if you are beyond the grid space
-            pass
+    def update_color(self, selected_row, selected_column, new_color):
+
+        if self.is_in_grid((selected_row, selected_column)):
+            updated = self.grid[selected_row][selected_column]
+            if not updated.color == new_color: # if Paintable already has that color value pass
+                updated.update(new_color) # change color of given Paintable
+                self.updated_cells.append(updated)
 
 
 class Cursor():

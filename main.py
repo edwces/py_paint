@@ -29,9 +29,10 @@ def draw_color_pallete(WINDOW):
     return color_buttons_list # return all of the buttons in the list
 
 
-def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
+def add_missing_points(mouse, prevx, prevy, x, y, size):
     """ Add missing Paintable color changes for inputs that were too slow """
     if mouse.prev_click_status == True: # if last frame mouse was clicked
+        missing = []
         missingx = x - prevx
         missingy = y - prevy
         steps = max(abs(missingx), abs(missingy)) + max(abs(missingx), abs(missingy)) # how many times we have to add inputs
@@ -42,7 +43,11 @@ def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
                 prevx += dx
                 prevy += dy
                 row, column = pos_to_grid(prevx, prevy, size)
-                grid.update_color(row, column, color) # update Paintable color for that input
+                missing.append([row, column])
+            return missing
+        else:
+            return False
+                
 
 
 
@@ -102,17 +107,24 @@ class Application():
                 selected_row, selected_column = pos_to_grid(self.mouse.x, self.mouse.y, self.grid.size)
                 if self.options["tool"] == "brush":
                     self.grid.update_color(selected_row, selected_column, (self.options["color"])) # update color of a clicked Paintable
-                    add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
-                                       self.mouse.y, PAINTABLE_SIZE, self.grid, self.options["color"])
+                    missing_inputs = add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
+                                                        self.mouse.y, PAINTABLE_SIZE)
+                    if missing_inputs:
+                        for grid_pos in missing_inputs:
+                            self.grid.update_color(grid_pos[0], grid_pos[1], self.options["color"])
 
                 elif self.options["tool"] == "eraser":
                     self.grid.update_color(selected_row, selected_column, WHITE) # update color of a clicked Paintable
-                    add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
-                                       self.mouse.y, PAINTABLE_SIZE, self.grid, WHITE)
+                    missing_inputs = add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
+                                                        self.mouse.y, PAINTABLE_SIZE)
+                    
+                    if missing_inputs:
+                        for grid_pos in missing_inputs:
+                            self.grid.update_color(grid_pos[0], grid_pos[1], WHITE)
 
                 elif self.options["tool"] == "color_picker":
                     selected_color = self.grid.get_color(selected_row, selected_column)
-                    if selected_color:
+                    if not selected_color == None:
                         self.options["color"] = selected_color # change the color you are drawing
 
         pg.display.flip() # Update the screen
@@ -120,7 +132,7 @@ class Application():
 
     def draw_frames(self):
         """ Function that draws on window """
-
+        self.grid.draw_updated_cells()
         # FPS counter
         if self.debug:
             pg.draw.rect(self.WINDOW, WHITE, (0,0, 50, 20)) # make new text visible
