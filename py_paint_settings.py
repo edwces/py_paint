@@ -32,4 +32,4 @@ RED = (255,0,0)
 WHITE = (255,255,255)
 COLORS = [BLACK, DARK_PURPLE, PURPLE, BLUE, GREEN, YELLOW, ORANGE, RED, WHITE]
 
-TOOLS = ["brush", "eraser", "color_picker"]
+TOOLS_ORDER = ["brush", "eraser", "color_picker", "paint_bucket"]

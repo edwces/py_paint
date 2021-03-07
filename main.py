@@ -13,7 +13,7 @@ from os import path, listdir
 
 def draw_tools(WINDOW, img_tools):
     tools_button_list = []
-    for i, tool in enumerate(TOOLS): # for each tool that we have in settings.py
+    for i, tool in enumerate(TOOLS_ORDER): # for each tool that we have in settings.py
         button = Button(WINDOW, WIDTH - 33, 27 * ((i + 11) + 1), BUTTON_WIDTH+5, BUTTON_HEIGHT+5, "tool", img_tools[tool], tool)
         button.draw()
         tools_button_list.append(button)
@@ -35,15 +35,16 @@ def add_missing_points(mouse, prevx, prevy, x, y, size, grid, color):
         missingx = x - prevx
         missingy = y - prevy
         steps = max(abs(missingx), abs(missingy)) + max(abs(missingx), abs(missingy)) # how many times we have to add inputs
-        try:
+        if steps > 0: # Gonna trigger if we have some missing inputs
             dx = missingx / steps # average of how much dx we have to add each step
             dy = missingy / steps
             for i in range(int(steps)):
                 prevx += dx
                 prevy += dy
-                grid.update_color(prevx, prevy, color) # update Paintable color for that input
-        except ZeroDivisionError: # Gonna trigger if we haven't got any missing inputs
-            pass
+                row, column = pos_to_grid(prevx, prevy, size)
+                grid.update_color(row, column, color) # update Paintable color for that input
+
+
 
 pg.init() # Initaliaze pygame
 
@@ -98,16 +99,19 @@ class Application():
                     self.options["tool"] = self.buttons[button_input].function # change your tool
 
             else:
+                selected_row, selected_column = pos_to_grid(self.mouse.x, self.mouse.y, self.grid.size)
                 if self.options["tool"] == "brush":
-                    self.grid.update_color(self.mouse.x, self.mouse.y, (self.options["color"])) # update color of a clicked Paintable
+                    self.grid.update_color(selected_row, selected_column, (self.options["color"])) # update color of a clicked Paintable
                     add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
                                        self.mouse.y, PAINTABLE_SIZE, self.grid, self.options["color"])
+
                 elif self.options["tool"] == "eraser":
-                    self.grid.update_color(self.mouse.x, self.mouse.y, WHITE) # update color of a clicked Paintable
+                    self.grid.update_color(selected_row, selected_column, WHITE) # update color of a clicked Paintable
                     add_missing_points(self.mouse, self.mouse.prevx, self.mouse.prevy, self.mouse.x,
                                        self.mouse.y, PAINTABLE_SIZE, self.grid, WHITE)
+
                 elif self.options["tool"] == "color_picker":
-                    selected_color = self.grid.get_color(self.mouse.x, self.mouse.y)
+                    selected_color = self.grid.get_color(selected_row, selected_column)
                     if selected_color:
                         self.options["color"] = selected_color # change the color you are drawing
 

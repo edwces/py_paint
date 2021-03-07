@@ -10,8 +10,8 @@ from py_paint_settings import *
 
 
 def pos_to_grid(x,y,size):
-    row = int(y / size)
-    column = int(x / size)
+    row = round(y / size)
+    column = round(x / size)
     return row, column
 
 def draw_GUI():
@@ -66,24 +66,22 @@ class Grid():
                 self.grid[row][obj].draw()
 
 
-    def get_color(self, x, y):
-        row, column = pos_to_grid(x, y, self.size)
+    def get_color(self, selected_row, selected_column):
         try:
-            selected_color = self.grid[row][column].color
+            selected_color = self.grid[selected_row][selected_column].color
             return selected_color
         except IndexError: # if you are beyond the grid space
             return False
 
 
 
-    def update_color(self, x, y, color):
-        row, column = pos_to_grid(x, y, self.size)
+    def update_color(self, selected_row, selected_column, color):
 
         try:
-            if self.grid[row][column].color == color: # if Paintable already has that color value pass
+            if self.grid[selected_row][selected_column].color == color: # if Paintable already has that color value pass
                 pass
             else:
-                self.grid[row][column].update(color) # change color of given Paintable
+                self.grid[selected_row][selected_column].update(color) # change color of given Paintable
         except IndexError: # if you are beyond the grid space
             pass
 
