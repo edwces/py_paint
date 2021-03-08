@@ -23,13 +23,28 @@ def draw_GUI():
     return surface
 
 
+  
+
+def paint_bucket_action(grid, grid_pos, color, color_to_be_filled):
+    neighbours = grid.get_neighbours(grid_pos[0], grid_pos[1])
+    grid.update_color(grid_pos[0], grid_pos[1], color)
+    for cell in neighbours:
+        if (cell.color == color_to_be_filled):
+            #print(cell.grid_pos)
+            #print(grid.get_color(cell_pos[0], cell_pos[1]))
+            #print(color_to_be_filled)
+            paint_bucket_action(grid, cell.grid_pos, color, color_to_be_filled)
+
+
+
 class Paintable():
     """ Cell with changeble color """
 
-    def __init__(self, size, color, pos, WINDOW):
+    def __init__(self, size, color, pos, grid_pos, WINDOW):
         self.color = color
         self.size = size
         self.pos = pos
+        self.grid_pos = grid_pos
         self.WINDOW = WINDOW
         self.surface = pg.Surface((size, size))
         self.surface.fill(color)
@@ -53,29 +68,29 @@ class Grid():
         self.rows = int(rows)
         self.columns = int(columns)
         self.size = size
-        self.grid = []
+        self.grid_list = []
         self.updated_cells = []
 
         for row in range(self.rows): # Create grid of Paintable objects
-            self.grid.append([])
+            self.grid_list.append([])
             for column in range(self.columns):
-               self.grid[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), self.WINDOW))
+               self.grid_list[row].append(Paintable(self.size, color, (self.posx + (self.size * column), self.posy + (self.size * row)), (row, column), self.WINDOW))
 
     def draw(self):
         for row in range(self.rows):
             for obj in range(self.columns):
-                self.grid[row][obj].draw()
+                self.grid_list[row][obj].draw()
 
-    def get_neigbours(self, selected_row, selected_column):
+    def get_neighbours(self, selected_row, selected_column):
         neighbours = []
-        for i in range(-1, 2, 2):
-            if self.is_in_grid((selected_row + (-1 * i), selected_column)):
-                new = self.grid[selected_row + (-1 * i)][selected_column]
-                neighbours.append(new)
-        for i in range(-1, 2, 2):
-            if self.is_in_grid((selected_row, selected_column  + (-1 *i))):
-                new = self.grid[selected_row][selected_column + (-1 *i)]
-                neighbours.append(new)
+        if selected_column < self.columns - 1: #Right
+            neighbours.append(self.grid_list[selected_row][selected_column + 1])
+        if selected_column > 0: #Left
+            neighbours.append(self.grid_list[selected_row][selected_column - 1])
+        if selected_row < self.rows - 1: #Up
+            neighbours.append(self.grid_list[selected_row + 1][selected_column])
+        if selected_row > 0 : #Down
+            neighbours.append(self.grid_list[selected_row - 1][selected_column])
         return neighbours
 
 
@@ -87,26 +102,26 @@ class Grid():
     def is_in_grid(self, grid_pos):
         occurrence = True
         try:
-            self.grid[grid_pos[0]][grid_pos[1]]
+            self.grid_list[grid_pos[0]][grid_pos[1]]
         except IndexError:
             occurrence = False
         return occurrence
 
     def get_color(self, selected_row, selected_column):
         if self.is_in_grid((selected_row, selected_column)):
-            selected_color = self.grid[selected_row][selected_column].color
+            selected_color = self.grid_list[selected_row][selected_column].color
             return selected_color
 
 
     def get_grid(self):
-        return self.grid
+        return self.grid_list
 
     
 
     def update_color(self, selected_row, selected_column, new_color):
 
         if self.is_in_grid((selected_row, selected_column)):
-            updated = self.grid[selected_row][selected_column]
+            updated = self.grid_list[selected_row][selected_column]
             if not updated.color == new_color: # if Paintable already has that color value pass
                 updated.update(new_color) # change color of given Paintable
                 self.updated_cells.append(updated)

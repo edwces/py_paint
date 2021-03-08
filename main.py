@@ -11,6 +11,8 @@ from class_module import *
 import sys
 from os import path, listdir
 
+sys.setrecursionlimit(10000)
+
 def draw_tools(WINDOW, img_tools):
     tools_button_list = []
     for i, tool in enumerate(TOOLS_ORDER): # for each tool that we have in settings.py
@@ -89,6 +91,7 @@ class Application():
         self.color_pallete = draw_color_pallete(self.WINDOW)
         self.tools_buttons = draw_tools(self.WINDOW, self.tools_imgs)
         self.buttons = self.color_pallete + self.tools_buttons
+       
 
     def update(self):
         """ Function, that updates app variables"""
@@ -126,6 +129,12 @@ class Application():
                     selected_color = self.grid.get_color(selected_row, selected_column)
                     if not selected_color == None:
                         self.options["color"] = selected_color # change the color you are drawing
+                
+                elif self.options["tool"] == "paint_bucket":
+                    selected_color = self.grid.get_color(selected_row, selected_column)
+                    if (not selected_color == None) and (not self.mouse.prev_click_status):
+                        paint_bucket_action(self.grid, (selected_row, selected_column), self.options["color"], selected_color)
+                        print("done")
 
         pg.display.flip() # Update the screen
 
