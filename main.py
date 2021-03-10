@@ -57,7 +57,7 @@ pg.init() # Initaliaze pygame
 
 class Application():
 
-    def __init__(self, debug=True):
+    def __init__(self, debug=False):
         """ Create window and create important variables"""
         self.WINDOW = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
@@ -132,9 +132,9 @@ class Application():
                 
                 elif self.options["tool"] == "paint_bucket":
                     selected_color = self.grid.get_color(selected_row, selected_column)
-                    if (not selected_color == None) and (not self.mouse.prev_click_status):
+                    if (selected_color != None) and (not self.mouse.prev_click_status) and (selected_color != self.options["color"]):
                         paint_bucket_action(self.grid, (selected_row, selected_column), self.options["color"], selected_color)
-                        print("done")
+                        
 
         pg.display.flip() # Update the screen
 

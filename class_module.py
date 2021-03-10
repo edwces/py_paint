@@ -7,7 +7,7 @@
 import pygame as pg
 from pygame.locals import *
 from py_paint_settings import *
-
+import sys
 
 def pos_to_grid(x,y,size):
     row = round(y / size)
@@ -25,15 +25,20 @@ def draw_GUI():
 
   
 
-def paint_bucket_action(grid, grid_pos, color, color_to_be_filled):
-    neighbours = grid.get_neighbours(grid_pos[0], grid_pos[1])
-    grid.update_color(grid_pos[0], grid_pos[1], color)
-    for cell in neighbours:
-        if (cell.color == color_to_be_filled):
-            #print(cell.grid_pos)
-            #print(grid.get_color(cell_pos[0], cell_pos[1]))
-            #print(color_to_be_filled)
-            paint_bucket_action(grid, cell.grid_pos, color, color_to_be_filled)
+def paint_bucket_action(grid, grid_pos, color, color_to_be_filled): # TODO: make this a while loop function
+    Stack = []
+    Stack.append(grid.grid_list[grid_pos[0]][grid_pos[1]])
+    while (len(Stack)):
+        new_cell = Stack.pop()
+        if (new_cell.color == color_to_be_filled):
+            grid.update_color(new_cell.grid_pos[0], new_cell.grid_pos[1], color)
+        else:
+            continue
+
+        for cell in grid.get_neighbours(new_cell.grid_pos[0], new_cell.grid_pos[1]):
+        
+            Stack.append(cell)
+    
 
 
 
