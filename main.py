@@ -166,5 +166,6 @@ def main():
         app.update()
         app.draw_frames()
         dt = app.clock.tick(FPS) / 1000 # limit FPS and calculate delta time
+        print(dt)
 
 main()
