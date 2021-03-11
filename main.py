@@ -8,47 +8,12 @@ import pygame as pg
 from pygame.locals import *
 from py_paint_settings import *
 from class_module import *
+from file_operations import *
+from draw_func import *
 import sys
 from os import path, listdir
 
 sys.setrecursionlimit(10000)
-
-def draw_tools(WINDOW, img_tools):
-    tools_button_list = []
-    for i, tool in enumerate(TOOLS_ORDER): # for each tool that we have in settings.py
-        button = Button(WINDOW, WIDTH - 33, 27 * ((i + 11) + 1), BUTTON_WIDTH+5, BUTTON_HEIGHT+5, "tool", img_tools[tool], tool)
-        button.draw()
-        tools_button_list.append(button)
-    return tools_button_list
-
-def draw_color_pallete(WINDOW):
-    """ Creates color_Buttons and draws them on the window """
-    color_buttons_list = []
-    for i, color in enumerate(COLORS): # for each color that we have in settings.py
-        button = Button(WINDOW, WIDTH - 30, 20 * (i + 1), BUTTON_WIDTH, BUTTON_HEIGHT, "color", color)
-        button.draw()
-        color_buttons_list.append(button)
-    return color_buttons_list # return all of the buttons in the list
-
-
-def add_missing_points(mouse, prevx, prevy, x, y, size):
-    """ Add missing Paintable color changes for inputs that were too slow """
-    if mouse.prev_click_status == True: # if last frame mouse was clicked
-        missing = []
-        missingx = x - prevx
-        missingy = y - prevy
-        steps = max(abs(missingx), abs(missingy)) + max(abs(missingx), abs(missingy)) # how many times we have to add inputs
-        if steps > 0: # Gonna trigger if we have some missing inputs
-            dx = missingx / steps # average of how much dx we have to add each step
-            dy = missingy / steps
-            for i in range(int(steps)):
-                prevx += dx
-                prevy += dy
-                row, column = pos_to_grid(prevx, prevy, size)
-                missing.append([row, column])
-            return missing
-        else:
-            return False
                 
 
 
@@ -134,6 +99,14 @@ class Application():
                     selected_color = self.grid.get_color(selected_row, selected_column)
                     if (selected_color != None) and (not self.mouse.prev_click_status) and (selected_color != self.options["color"]):
                         paint_bucket_action(self.grid, (selected_row, selected_column), self.options["color"], selected_color)
+
+                elif self.options["tool"] == "save":
+                    if self.mouse.prev_click_status == False:
+                        save_as_img(self.grid)
+
+                elif self.options["tool"] == "load":
+                    if self.mouse.prev_click_status == False:
+                        load_grid_from_img(self.grid)
                         
 
         pg.display.flip() # Update the screen
@@ -166,6 +139,6 @@ def main():
         app.update()
         app.draw_frames()
         dt = app.clock.tick(FPS) / 1000 # limit FPS and calculate delta time
-        print(dt)
+        #print(dt)
 
 main()

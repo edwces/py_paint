@@ -1,7 +1,7 @@
 # Grid settings
 PAINTABLE_SIZE = 5
-ROWS = int(128 * (5 / PAINTABLE_SIZE))
-COLUMNS = int(128 * (5 / PAINTABLE_SIZE))
+ROWS = int(256 * (5 / PAINTABLE_SIZE))
+COLUMNS = int(256 * (5 / PAINTABLE_SIZE))
 DEFAULT_COLOR = (255, 255, 255)
 
 # GUI settings
@@ -32,4 +32,4 @@ RED = (255,0,0)
 WHITE = (255,255,255)
 COLORS = [BLACK, DARK_PURPLE, PURPLE, BLUE, GREEN, YELLOW, ORANGE, RED, WHITE]
 
-TOOLS_ORDER = ["brush", "eraser", "color_picker", "paint_bucket"]
+TOOLS_ORDER = ["brush", "eraser", "color_picker", "paint_bucket", "save", "load"]

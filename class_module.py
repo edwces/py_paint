@@ -16,16 +16,6 @@ def pos_to_grid(x, y, size):
     return row, column
 
 
-def draw_GUI():
-    surface = pg.Surface((GUI_WIDTH, GUI_HEIGHT))
-    background = surface.get_rect()
-    pg.draw.rect(surface, GUI_BORDER, background)  # draw a border
-    pg.draw.rect(surface, GUI_BACKGROUND,
-                 (background[0] + 5, background[1] + 5, background[2], background[3] - 10))
-
-    return surface
-
-
 # TODO: make this a while loop function
 def paint_bucket_action(grid, grid_pos, color, color_to_be_filled):
     Stack = []
@@ -102,6 +92,7 @@ class Grid():
         for row in range(self.rows):
             for obj in range(self.columns):
                 self.grid_list[row][obj].draw()
+        print("full_drawing")
 
     def draw_updated_cells(self):
         for paintable in self.updated_cells:
@@ -167,7 +158,7 @@ class Button():
             self.color = var
             self.surface = pg.Surface((w, h))
             self.surface.fill(self.color)
-        elif b_type == "tool":
+        elif (b_type == "tool") or (b_type == "click"):
             self.function = function
             self.surface = pg.transform.smoothscale(
                 var, (w, h)).convert_alpha()
